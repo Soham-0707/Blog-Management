@@ -7,14 +7,14 @@ RUN apt-get update && apt-get install -y \
     curl \
     nginx \
     supervisor \
-    mysql-client \
-    libpq-dev
+    default-mysql-client \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions
 RUN docker-php-ext-install \
     pdo \
     pdo_mysql \
-    pdo_pgsql \
     bcmath \
     ctype \
     fileinfo \
@@ -35,18 +35,17 @@ COPY . .
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-# Install Node dependencies and build frontend
+# Install Node.js
 RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
     apt-get install -y nodejs && \
     npm install && \
-    npm run build
+    npm run build && \
+    rm -rf /var/lib/apt/lists/*
 
 # Set permissions
 RUN chmod -R 777 storage bootstrap/cache && \
-    chmod -R 777 public/build
-
-# Create Laravel necessary directories
-RUN mkdir -p storage/logs && \
+    chmod -R 777 public && \
+    mkdir -p storage/logs && \
     chmod -R 777 storage
 
 # Configure Nginx
@@ -59,14 +58,13 @@ COPY laravel-site.conf /etc/nginx/conf.d/default.conf
 RUN mkdir -p /etc/supervisor/conf.d
 COPY supervisor.conf /etc/supervisor/conf.d/laravel.conf
 
-# Generate Laravel key and run migrations
+# Prepare Laravel
 RUN php artisan config:clear && \
     php artisan config:cache && \
-    php artisan route:cache && \
-    php artisan migrate --force || true
+    php artisan route:cache
 
-# Start services
 EXPOSE 10000
 
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/laravel.conf"]
+
 
