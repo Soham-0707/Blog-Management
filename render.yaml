@@ -1,25 +1,18 @@
 services:
   - type: web
     name: blog-management
-    runtime: php
-    phpVersion: "8.2"
-    buildCommand: |
-      composer install --no-dev --optimize-autoloader && \
-      npm install && \
-      npm run build && \
-      php artisan config:clear && \
-      php artisan config:cache && \
-      php artisan route:cache && \
-      chmod -R 777 storage bootstrap/cache && \
-      php artisan migrate --force --no-interaction
-    startCommand: sh -c 'php -S 0.0.0.0:$PORT -t public/'
+    runtime: docker
+    plan: standard
+    dockerfile: ./Dockerfile
+    dockerCommand: /usr/bin/supervisord -c /etc/supervisor/conf.d/laravel.conf
+    healthCheckPath: /up
     envVars:
       - key: APP_ENV
         value: production
       - key: APP_DEBUG
         value: false
       - key: LOG_CHANNEL
-        value: stderr
+        value: stack
       - key: SESSION_DRIVER
         value: cookie
       - key: CACHE_STORE
