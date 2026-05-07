@@ -1,30 +1,20 @@
-FROM php:8.2-fpm
+FROM php:8.2-fpm-alpine
 
 # Install system dependencies
-RUN apt-get update && apt-get install -y \
+RUN apk add --no-cache \
     git \
-    unzip \
     curl \
     nginx \
     supervisor \
-    default-mysql-client \
-    libzip-dev \
-    && rm -rf /var/lib/apt/lists/*
+    npm \
+    nodejs \
+    libxml2-dev \
+    oniguruma-dev
 
-# Install PHP extensions - core extensions
-RUN docker-php-ext-install -j$(nproc) \
-    pdo \
-    pdo_mysql \
-    zip
-
-# Install PHP extensions - additional
-RUN docker-php-ext-install -j$(nproc) \
-    bcmath \
-    ctype \
-    fileinfo \
-    mbstring \
-    tokenizer \
-    xml
+# Install PHP extensions with minimal dependencies
+RUN docker-php-ext-configure pdo_mysql && \
+    docker-php-ext-install -j$(nproc) pdo pdo_mysql && \
+    docker-php-ext-install -j$(nproc) xml mbstring
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -37,23 +27,16 @@ COPY . .
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-# Install Node.js and build frontend
-RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
-    apt-get install -y nodejs && \
-    npm install && \
-    npm run build && \
-    rm -rf /var/lib/apt/lists/*
+# Install Node dependencies and build frontend
+RUN npm install && npm run build
 
 # Set permissions
 RUN chmod -R 777 storage bootstrap/cache && \
-    chmod -R 777 public && \
     mkdir -p storage/logs && \
     chmod -R 777 storage
 
 # Configure Nginx
-RUN rm -f /etc/nginx/sites-enabled/* /etc/nginx/sites-available/*
-
-COPY nginx.conf /etc/nginx/nginx.conf
+RUN rm -f /etc/nginx/conf.d/default.conf
 COPY laravel-site.conf /etc/nginx/conf.d/default.conf
 
 # Configure Supervisor
@@ -68,6 +51,7 @@ RUN php artisan config:clear && \
 EXPOSE 10000
 
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/laravel.conf"]
+
 
 
 
