@@ -1,7 +1,6 @@
 FROM php:8.2-cli
 
 RUN apt-get update && apt-get install -y \
-    git \
     unzip \
     curl \
     zip \
@@ -13,15 +12,6 @@ RUN apt-get update && apt-get install -y \
     npm
 
 RUN docker-php-ext-install pdo pdo_mysql zip mbstring exif pcntl bcmath gd
-    unzip \
-    curl \
-    git \
-    libzip-dev \
-    zip \
-    nodejs \
-    npm
-
-RUN docker-php-ext-install pdo pdo_mysql zip
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
@@ -29,15 +19,13 @@ WORKDIR /app
 
 COPY . .
 
-<<<<<<< HEAD
-RUN composer install --no-dev --optimize-autoloader
-=======
 RUN composer install
->>>>>>> 2f31a10 (Added Docker deployment files)
 
 RUN npm install
 
 RUN npm run build
+
+RUN chmod -R 777 storage bootstrap/cache
 
 <<<<<<< HEAD
 RUN chmod -R 777 storage bootstrap/cache
