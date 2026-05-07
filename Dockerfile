@@ -8,21 +8,23 @@ RUN apt-get update && apt-get install -y \
     nginx \
     supervisor \
     default-mysql-client \
-    libpq-dev \
+    libzip-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Install PHP extensions
-RUN docker-php-ext-install \
+# Install PHP extensions - core extensions
+RUN docker-php-ext-install -j$(nproc) \
     pdo \
     pdo_mysql \
+    zip
+
+# Install PHP extensions - additional
+RUN docker-php-ext-install -j$(nproc) \
     bcmath \
     ctype \
     fileinfo \
-    json \
     mbstring \
     tokenizer \
-    xml \
-    zip
+    xml
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -35,7 +37,7 @@ COPY . .
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-# Install Node.js
+# Install Node.js and build frontend
 RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
     apt-get install -y nodejs && \
     npm install && \
@@ -66,5 +68,6 @@ RUN php artisan config:clear && \
 EXPOSE 10000
 
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/laravel.conf"]
+
 
 
