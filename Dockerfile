@@ -5,6 +5,8 @@ RUN apt-get update && apt-get install -y \
     unzip \
     curl \
     zip \
+    sqlite3 \
+    libsqlite3-dev \
     libzip-dev \
     nodejs \
     npm
@@ -25,6 +27,6 @@ RUN npm run build
 
 RUN chmod -R 777 storage bootstrap/cache
 
-EXPOSE 8080
+EXPOSE 10000
 
-CMD php artisan serve --host=0.0.0.0 --port=8080
+CMD php artisan serve --host=0.0.0.0 --port=10000
