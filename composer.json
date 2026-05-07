@@ -1,25 +1,25 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "Blog Management/Blog Management",
+    "name": "laravel/laravel",
     "type": "project",
-    "description": "The skeleton application for the Blog Management framework.",
-    "keywords": ["Blog Management", "framework"],
+    "description": "The skeleton application for the Laravel framework.",
+    "keywords": ["laravel", "framework"],
     "license": "MIT",
     "require": {
         "php": "^8.2",
-        "Blog Management/framework": "^12.0",
-        "Blog Management/tinker": "^2.10.1"
+        "laravel/framework": "^12.0",
+        "laravel/tinker": "^2.10.1"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
-        "Blog Management/breeze": "^2.4",
-        "Blog Management/pail": "^1.2.2",
-        "Blog Management/pint": "^1.24",
-        "Blog Management/sail": "^1.41",
+        "laravel/breeze": "^2.4",
+        "laravel/pail": "^1.2.2",
+        "laravel/pint": "^1.24",
+        "laravel/sail": "^1.41",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.6",
         "pestphp/pest": "^3.8",
-        "pestphp/pest-plugin-Blog Management": "^3.2"
+        "pestphp/pest-plugin-laravel": "^3.2"
     },
     "autoload": {
         "psr-4": {

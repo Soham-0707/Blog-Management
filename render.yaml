@@ -1,0 +1,57 @@
+services:
+  - type: web
+    name: blog-management
+    runtime: php
+    phpVersion: "8.2"
+    buildCommand: |
+      composer install --no-dev --optimize-autoloader && \
+      npm install && \
+      npm run build && \
+      php artisan config:clear && \
+      php artisan key:generate && \
+      php artisan migrate --force --no-interaction
+    startCommand: php -S 0.0.0.0:10000 -t public/
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: LOG_CHANNEL
+        value: stderr
+      - key: SESSION_DRIVER
+        value: cookie
+      - key: CACHE_STORE
+        value: array
+      - key: QUEUE_CONNECTION
+        value: sync
+      - key: FILESYSTEM_DISK
+        value: local
+  - type: mysql
+    name: blog-db
+    plan: standard
+    mysqlVersion: "8.0"
+    ipAllowList:
+      - source: 0.0.0.0/0
+        description: all
+
+envVarGroups:
+  - name: Blog Management App
+    envVars:
+      - key: APP_NAME
+        value: Blog Management
+      - key: APP_URL
+        generateValue: $RENDER_EXTERNAL_URL
+      - key: DB_CONNECTION
+        value: mysql
+      - key: DB_HOST
+        generateValue: ${{ blog-db.MYSQL_HOSTNAME }}
+      - key: DB_PORT
+        value: "3306"
+      - key: DB_DATABASE
+        value: blog_management
+      - key: DB_USERNAME
+        value: ${{ blog-db.MYSQL_USER }}
+      - key: DB_PASSWORD
+        generateValue: ${{ blog-db.MYSQL_PASSWORD }}
+      - key: APP_KEY
+        syncEnv: true
