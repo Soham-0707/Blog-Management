@@ -47,7 +47,8 @@ COPY supervisor.conf /etc/supervisor/conf.d/laravel.conf
 # Prepare Laravel
 RUN php artisan config:clear && \
     php artisan config:cache && \
-    php artisan route:cache
+    php artisan route:cache && \
+    mkdir -p /tmp && chmod 777 /tmp
 
 EXPOSE 10000
 
