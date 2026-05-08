@@ -40,7 +40,8 @@ RUN rm -f /etc/nginx/conf.d/default.conf
 COPY laravel-site.conf /etc/nginx/conf.d/default.conf
 
 # Configure Supervisor
-RUN mkdir -p /etc/supervisor/conf.d
+RUN mkdir -p /etc/supervisor/conf.d && \
+    mkdir -p /var/log/supervisor
 COPY supervisor.conf /etc/supervisor/conf.d/laravel.conf
 
 # Prepare Laravel
