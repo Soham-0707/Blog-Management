@@ -1,4 +1,5 @@
 @import "bootstrap/dist/css/bootstrap.min.css";
+@layer theme, base, components, utilities;
 
 :root {
     --brand-primary: #4338ca;
